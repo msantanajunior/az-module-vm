@@ -41,5 +41,5 @@ variable "availability_set" {
 
 variable "boot_diag" {
   type = string
-  default = "https://stpinfractim.blob.core.windows.net/"
+  default = ""
 }
