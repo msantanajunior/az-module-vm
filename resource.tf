@@ -39,9 +39,9 @@ resource "azurerm_linux_virtual_machine" "vm" {
     sku = lookup(var.os_image,"sku","8.2")
     version = lookup(var.os_image,"version","latest")
   }
-  # boot_diagnostics {
-  #   storage_account_uri = var.boot_diag
-  #}
+  boot_diagnostics {
+    storage_account_uri = var.boot_diag
+  }
   additional_capabilities {
     ultra_ssd_enabled = lookup(local.sizes, var.size) == "Premium_LRS" ? "true" : null
   }

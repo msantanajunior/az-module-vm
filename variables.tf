@@ -1,4 +1,4 @@
-variable "name" {
+ariable "name" {
   type = string
 }
 variable "location" {
@@ -41,5 +41,5 @@ variable "availability_set" {
 
 variable "boot_diag" {
   type = string
-  default = ""
+  default = "https://stpinfractim.blob.core.windows.net/"
 }
