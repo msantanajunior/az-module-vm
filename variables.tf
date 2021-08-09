@@ -1,4 +1,4 @@
-ariable "name" {
+variable "name" {
   type = string
 }
 variable "location" {
