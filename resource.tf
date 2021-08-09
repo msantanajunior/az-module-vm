@@ -1,33 +1,37 @@
 resource "azurerm_network_interface" "nic" {
   for_each = var.nics
-  name = "${var.name}-nic${index((keys(var.nics)),each.key)}" 
+  name = lower("${var.name}_${each.key}")
   location = var.location
   resource_group_name = var.rg_name
   enable_accelerated_networking = lookup(each.value, "enable_accelerated_networking", "false")
   ip_configuration {
-    name = "ipconfig${index((keys(var.nics)),each.key)+1}"
+    name = "ipconfig1"
     subnet_id = data.azurerm_subnet.subnet[each.key].id
     private_ip_address_version = lookup(each.value, "private_ip_address_version", "IPv4")
     public_ip_address_id = lookup(each.value, "public_ip_address_id", null)
     primary = lookup(each.value, "primary", "false")
     private_ip_address_allocation = lookup(each.value, "private_ip_address_allocation", "Dynamic")
   }
-  tags = var.tags
+  tags = local.tags
+  lifecycle {
+    ignore_changes = [
+      tags["create_date"]
+    ]
+  }
 }
-
 resource "azurerm_linux_virtual_machine" "vm" {
   depends_on = [
     azurerm_network_interface.nic
   ]
-  name = var.name
+  name = lower(var.name)
   computer_name = var.name
   resource_group_name = var.rg_name
   location = var.location
   size = var.size
-  admin_username = "avaadmin"
-  admin_password = "P@ssword."
+  admin_username = var.admin
+  admin_password = var.password
   disable_password_authentication = false
-  encryption_at_host_enabled = false
+  #encryption_at_host_enabled = true
   network_interface_ids = values(azurerm_network_interface.nic)[*].id 
   os_disk {
     caching = "ReadWrite"
@@ -46,20 +50,30 @@ resource "azurerm_linux_virtual_machine" "vm" {
     ultra_ssd_enabled = lookup(local.sizes, var.size) == "Premium_LRS" ? "true" : null
   }
   availability_set_id = var.availability_set
-  tags = var.tags
+  tags = local.tags
+  lifecycle {
+    ignore_changes = [
+      tags["create_date"]
+    ]
+  }
 }
 resource "azurerm_managed_disk" "disk" {
   for_each = var.data_disks
-  name = "${var.name}_${each.key}"
+  name = lower("${var.name}_${each.key}")
   location = var.location
   resource_group_name = var.rg_name
-  storage_account_type = lookup(each.value, "storage_account_type", "StandardSSD_LRS")
+  storage_account_type =  lookup(each.value, "storage_account_type", "StandardSSD_LRS")
   create_option = "Empty"
   disk_size_gb = lookup(each.value, "disk_size", "20")
   disk_iops_read_write = lookup(each.value, "iops", "500")
   disk_mbps_read_write = lookup(each.value, "mbps", "60")
   zones = lookup(each.value, "zones", null) != null ? split(",",lookup(each.value, "zones")) : null 
-  tags = var.tags
+  tags = local.tags
+  lifecycle {
+    ignore_changes = [
+      tags["create_date"]
+    ]
+  }
 }
 resource "azurerm_virtual_machine_data_disk_attachment" "disk_attach" {
   for_each = var.data_disks

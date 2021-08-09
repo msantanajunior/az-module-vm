@@ -24,6 +24,7 @@ Para evitar que seu código receba atualizações automáticas do modulo, é pre
   name = "azrlnx01"
   location = "Brazil South"
   rg_name = "rg_name"
+  password = "P@ssword!"
   os_image = {
       sku = "8.2"
     }
@@ -66,10 +67,11 @@ output "vm_name" {
 | rg_name | nome do resource group onde os recursos serão alocados | `string` | n/a | Sim |
 | tags | Tags adicionais | `map(any)` | `{}` | Não |
 | location | região no Azure onde o arquivo será criado | `string` | n/a | Sim |
-| data_disks | utilizado para adicionar 1 ou mais discos à VM | `map(map(string)` | n/a | Sim |
-| os_image | utilizado pra alterar a versão do SO da VM | `map(string)` | n/a | Sim |
+| data_disks | utilizado para adicionar 1 ou mais discos à VM | `map(map(string)` | `{}` | Não |
+| os_image | utilizado pra alterar a versão do SO da VM | `map(string)` | `{}` | Não |
 | nics | utilizado para adicionar 1 ou mais Nics à VM | `map(map(string)` | n/a | Sim |
-
+| admin | nome dado a conta de admin | `string (sensitive)` | `avaadmin` | Não |
+| password | senha da conta admin | `string (sensitive)` | n/a | Sim | 
 
 
 ## Saída de Valores
@@ -79,6 +81,7 @@ output "vm_name" {
 | vm_name | nome dado ao recurso e ao host |
 | nics | exibe todas as nics criadas para à VM |
 | vm_public_ip | ips privados atribuidos à VM |
+
 
 ## Documentação de Referência
 
